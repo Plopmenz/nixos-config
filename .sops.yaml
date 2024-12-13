@@ -1,0 +1,7 @@
+keys:
+  - &plopmenz age1acdxvdwqhkla3qy5ylh47xw59utru7c70ac5ezwcq8sjpym2n4ssm7lnxe
+creation_rules:
+  - path_regex: secrets/plopmenz.yaml$
+    key_groups:
+    - age:
+      - *plopmenz
