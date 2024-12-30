@@ -14,7 +14,16 @@
     packages = [
       pkgs.nodejs_22
       pkgs.bun
+      pkgs.gcc
+      pkgs.cargo
+      pkgs.rustc
+      pkgs.rustfmt
+      pkgs.clippy
+      pkgs.nixpkgs-fmt
     ];
+    sessionVariables = {
+      RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+    };
   };
 
   programs.home-manager.enable = true;
@@ -60,6 +69,9 @@
       #juanblanco.solidity
       bradlc.vscode-tailwindcss
     ];
+    userSettings = {
+      "editor.formatOnSave" = true;
+    };
   };
 
   systemd.user.startServices = "sd-switch";

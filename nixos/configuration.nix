@@ -6,7 +6,8 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
     ];
@@ -15,30 +16,33 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  nix = let
-    flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
-  in {
-    settings = {
-      experimental-features = "nix-command flakes";
-      flake-registry = "";
-      nix-path = config.nix.nixPath;
-      auto-optimise-store = true;
-    };
-    channel.enable = false;
+  nix =
+    let
+      flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+    in
+    {
+      settings = {
+        experimental-features = "nix-command flakes";
+        flake-registry = "";
+        nix-path = config.nix.nixPath;
+        auto-optimise-store = true;
+      };
+      channel.enable = false;
 
-    registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
-    nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+      registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
+      nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
 
-    gc = {
-      automatic = true;
-      dates = "hourly";
-      randomizedDelaySec = "15min";
-      options = "--delete-old +1 --delete-older-than 1d";
+      gc = {
+        automatic = true;
+        dates = "hourly";
+        randomizedDelaySec = "15min";
+        options = "--delete-old --delete-older-than 1d";
+      };
     };
-  };
 
   home-manager = {
     extraSpecialArgs = { inherit inputs outputs; };
+    backupFileExtension = "hmbackup";
     users = {
       plopmenz = import ../home-manager/plopmenz.nix;
     };
@@ -113,7 +117,7 @@
     isNormalUser = true;
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-    #  thunderbird
+      #  thunderbird
     ];
   };
 
@@ -126,8 +130,8 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
     pkgs.age
   ];
 
@@ -163,4 +167,58 @@
     sysedit = "sudo nano /etc/nixos/nixos/configuration.nix";
     sysflake = "sudo nano /etc/nixos/flake.nix";
   };
+
+  # services.avahi = {
+  #   enable = true;
+  #   nssmdns4 = true;
+  #   openFirewall = true;
+  #   publish = {
+  #       enable = true;
+  #       userServices = true;
+  #       addresses = true;
+  #   };
+  # };
+
+  # security.acme = {
+  #   acceptTerms = true;
+  #   defaults.email = "plopmenz@gmail.com";
+  #   preliminarySelfsigned = true;
+  #   defaults.server = "https://127.0.0.1";
+  # };
+  # services.nginx = {
+  #   enable = true;
+
+  #   virtualHosts."plopmenzPC.local" = {
+  #     forceSSL = true;
+  #     enableACME = true;
+  #     locations."/" = {
+  #       proxyPass = "http://192.168.100.11";
+  #     };
+  #   };
+  # };
+
+  # networking.nat = {
+  #   enable = true;
+  # };
+
+  # containers.test = {
+  #   autoStart = true;
+  #   privateNetwork = true;
+  #   hostAddress = "192.168.100.10";
+  #   localAddress = "192.168.100.11";
+  #   config = { config, pkgs, lib, ...}: {
+  #     boot.isContainer = true;
+
+  #     services.nextcloud = {
+  #       enable = true;
+  #       package = pkgs.nextcloud28;
+  #       hostName = "localhost";
+  #       config.adminpassFile = "${pkgs.writeText "adminpass" "test123"}";
+  #     };
+
+  #     networking.firewall.allowedTCPPorts = [ 80 ];
+
+  #     system.stateVersion = "24.05";
+  #   };
+  # };
 }
