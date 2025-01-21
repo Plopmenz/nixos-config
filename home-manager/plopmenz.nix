@@ -20,11 +20,45 @@
       pkgs.rustfmt
       pkgs.clippy
       pkgs.nixpkgs-fmt
+
+      pkgs.discord
+      pkgs.telegram-desktop
     ];
     sessionVariables = {
       RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
     };
   };
+
+  # start dark mode
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Breeze-Dark";
+      package = pkgs.libsForQt5.breeze-gtk;
+    };
+    gtk3 = {
+      extraConfig.gtk-application-prefer-dark-theme = true;
+    };
+  };
+
+  qt = {
+    enable = true;
+    platformTheme = {
+      name = "gtk";
+    };
+    style = {
+      name = "gtk2";
+      package = pkgs.libsForQt5.breeze-qt5;
+    };
+  };
+
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      gtk-theme = "Breeze-Dark";
+      color-scheme = "prefer-dark";
+    };
+  };
+  # end dark mode
 
   programs.home-manager.enable = true;
   programs.bash.enable = true; # required to generate shell aliases
