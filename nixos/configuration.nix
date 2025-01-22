@@ -79,15 +79,10 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
+  # Hyprland
+  programs.hyprland.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -133,6 +128,8 @@
     #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     #  wget
     pkgs.age
+    pkgs.kitty
+    pkgs.brightnessctl
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
