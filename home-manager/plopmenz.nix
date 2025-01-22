@@ -29,6 +29,7 @@
       pkgs.networkmanager
 
       pkgs.libreoffice
+      pkgs.gimp
 
       pkgs.discord
       pkgs.telegram-desktop
@@ -134,8 +135,6 @@
       "$mod, mouse:273, resizewindow"
     ];
 
-    exec-once = "waybar";
-
     gestures = {
       workspace_swipe = true;
     };
@@ -164,7 +163,7 @@
       position = "top";
       spacing = 4;
       modules-left = [
-        "custom/nix"
+        "image#os"
         "hyprland/workspaces"
       ];
       modules-center = [
@@ -177,12 +176,12 @@
         "memory"
         "temperature"
         "battery"
-        "battery#bat2"
         "clock"
       ];
 
-      "custom/nix" = {
-        format = "";
+      "image#os" = {
+        path = "/etc/nixos/assets/plopmenz.svg";
+        size = 25;
         tooltip = false;
         on-click = "poweroff";
         on-click-right = "reboot";
@@ -247,13 +246,10 @@
         };
         format = "{icon}   {capacity}%";
         format-full = "{icon}   {capacity}%";
-        format-charging = "   {capacity}%";
-        format-plugged = "   {capacity}%";
+        format-charging = " {capacity}%";
+        format-plugged = " {capacity}%";
         format-alt = "{time}   {icon}";
         format-icons = [ "" "" "" "" "" ];
-      };
-      "battery#bat2" = {
-        bat = "BAT2";
       };
       "clock" = {
         format = "{:%H:%M | %e %B} ";
@@ -263,36 +259,36 @@
     }
   ];
   programs.waybar.style = ''
-      * {
-        /* `otf-font-awesome` and SpaceMono Nerd Font are required to be installed for icons */
-        font-family: "Fira Sans Semibold", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
-        font-size: 15px;
-        transition: background-color .3s ease-out;
+    * {
+      /* `otf-font-awesome` and SpaceMono Nerd Font are required to be installed for icons */
+      font-family: "Fira Sans Semibold", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      transition: background-color .3s ease-out;
     }
 
     window#waybar {
-        background: rgba(26, 27, 38, 0.75);
-        color: #c0caf5;
-        font-family: 
-            SpaceMono Nerd Font,
-            feather;
-        transition: background-color .5s;
+      background: rgba(26, 27, 38, 0.75);
+      color: #c0caf5;
+      font-family: 
+        SpaceMono Nerd Font,
+        feather;
+      transition: background-color .5s;
     }
 
     .modules-left,
     .modules-center,
     .modules-right
     {
-        background: rgba(0, 0, 8, .7);
-        margin: 5px 10px;
-        padding: 0 5px;
-        border-radius: 15px;
+      background: rgba(0, 0, 8, .7);
+      margin: 5px 10px;
+      padding: 0 5px;
+      border-radius: 15px;
     }
     .modules-left {
-        padding: 0;
+      padding: 0;
     }
     .modules-center {
-        padding: 0 10px;
+      padding: 0 10px;
     }
 
     #clock,
@@ -311,8 +307,8 @@
     #scratchpad,
     #power-profiles-daemon,
     #mpd {
-        padding: 0 10px;
-        border-radius: 15px;
+      padding: 0 10px;
+      border-radius: 15px;
     }
 
     #clock:hover,
@@ -331,7 +327,7 @@
     #scratchpad:hover,
     #power-profiles-daemon:hover,
     #mpd:hover {
-        background: rgba(26, 27, 38, 0.9);
+      background: rgba(26, 27, 38, 0.9);
     }
 
 
@@ -348,7 +344,7 @@
     }
 
     #workspaces button.active {
-        background: #13131d; 
+      background: #13131d; 
     }
 
     #workspaces button:hover {
@@ -357,16 +353,12 @@
       box-shadow: none;
     }
 
-    #custom-nix {
-        margin-left: 5px;
-        padding: 0 10px;
-        font-size: 20px;
-        transition: color .5s;
-    }
-    #custom-nix:hover {
-        color: #c44444;
+    #image.os {
+      margin-left: 10px;
+      padding: 2px 0px;
     }
   '';
+  programs.waybar.systemd.enable = true;
   # end window manager
 
   # start dark mode
