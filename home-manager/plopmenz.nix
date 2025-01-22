@@ -184,6 +184,8 @@
       "custom/nix" = {
         format = "";
         tooltip = false;
+        on-click = "poweroff";
+        on-click-right = "reboot";
       };
 
       "hyprland/workspaces" = {
@@ -362,7 +364,7 @@
         transition: color .5s;
     }
     #custom-nix:hover {
-        color: #1793d1;
+        color: #c44444;
     }
   '';
   # end window manager

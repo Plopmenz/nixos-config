@@ -81,8 +81,7 @@
 
   # Hyprland
   programs.hyprland.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
+  services.xserver.displayManager.lightdm.enable = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
