@@ -24,6 +24,7 @@
       pkgs.font-awesome
       (pkgs.nerdfonts.override { fonts = [ "SpaceMono" ]; })
 
+      pkgs.pcmanfm
       pkgs.hyprshot
       pkgs.pavucontrol
       pkgs.networkmanager
@@ -120,6 +121,11 @@
 
       # Applications
       "$mod ALT, b, exec, brave"
+      "$mod ALT, c, exec, code"
+      "$mod ALT, d, exec, discord"
+      "$mod ALT, f, exec, pcmanfm"
+      "$mod ALT, t, exec, telegram-desktop"
+      "$mod ALT, w, exec, swriter"
 
       # Brightness
       ",XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 2%-"
