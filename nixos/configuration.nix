@@ -2,15 +2,21 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ inputs, outputs, lib, config, pkgs, ... }:
+{
+  inputs,
+  outputs,
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 
 {
-  imports =
-    [
-      # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      inputs.home-manager.nixosModules.home-manager
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    inputs.home-manager.nixosModules.home-manager
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -26,6 +32,9 @@
         flake-registry = "";
         nix-path = config.nix.nixPath;
         auto-optimise-store = true;
+
+        # substituters = [ "https://hyprland.cachix.org" ];
+        # trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
       };
       channel.enable = false;
 
@@ -80,8 +89,10 @@
   services.xserver.enable = true;
 
   # Hyprland
-  programs.hyprland.enable = true;
-  services.xserver.displayManager.lightdm.enable = true;
+  programs.hyprland = {
+    enable = true;
+    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+  };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -109,7 +120,10 @@
   users.users.plopmenz = {
     initialPassword = "plopmenz";
     isNormalUser = true;
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     packages = with pkgs; [
       #  thunderbird
     ];
@@ -160,61 +174,8 @@
 
   environment.shellAliases = {
     sysrebuild = "sudo nixos-rebuild switch --flake /etc/nixos/#plopmenzPC";
+    sysupdate = "sudo nixos-rebuild switch --flake /etc/nixos/#plopmenzPC --update-input";
     sysedit = "sudo nano /etc/nixos/nixos/configuration.nix";
     sysflake = "sudo nano /etc/nixos/flake.nix";
   };
-
-  # services.avahi = {
-  #   enable = true;
-  #   nssmdns4 = true;
-  #   openFirewall = true;
-  #   publish = {
-  #       enable = true;
-  #       userServices = true;
-  #       addresses = true;
-  #   };
-  # };
-
-  # security.acme = {
-  #   acceptTerms = true;
-  #   defaults.email = "plopmenz@gmail.com";
-  #   preliminarySelfsigned = true;
-  #   defaults.server = "https://127.0.0.1";
-  # };
-  # services.nginx = {
-  #   enable = true;
-
-  #   virtualHosts."plopmenzPC.local" = {
-  #     forceSSL = true;
-  #     enableACME = true;
-  #     locations."/" = {
-  #       proxyPass = "http://192.168.100.11";
-  #     };
-  #   };
-  # };
-
-  # networking.nat = {
-  #   enable = true;
-  # };
-
-  # containers.test = {
-  #   autoStart = true;
-  #   privateNetwork = true;
-  #   hostAddress = "192.168.100.10";
-  #   localAddress = "192.168.100.11";
-  #   config = { config, pkgs, lib, ...}: {
-  #     boot.isContainer = true;
-
-  #     services.nextcloud = {
-  #       enable = true;
-  #       package = pkgs.nextcloud28;
-  #       hostName = "localhost";
-  #       config.adminpassFile = "${pkgs.writeText "adminpass" "test123"}";
-  #     };
-
-  #     networking.firewall.allowedTCPPorts = [ 80 ];
-
-  #     system.stateVersion = "24.05";
-  #   };
-  # };
 }

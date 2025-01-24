@@ -1,4 +1,10 @@
-{ inputs, lib, config, pkgs, ... }:
+{
+  inputs,
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 
 {
   nixpkgs.config.allowUnfree = true;
@@ -19,7 +25,7 @@
       pkgs.rustc
       pkgs.rustfmt
       pkgs.clippy
-      pkgs.nixpkgs-fmt
+      pkgs.nixfmt-rfc-style
 
       pkgs.font-awesome
       (pkgs.nerdfonts.override { fonts = [ "SpaceMono" ]; })
@@ -34,6 +40,8 @@
 
       pkgs.discord
       pkgs.telegram-desktop
+
+      pkgs.postman
     ];
     sessionVariables = {
       RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
@@ -42,351 +50,313 @@
 
   # start window manager
   programs.kitty.enable = true;
-  wayland.windowManager.hyprland.enable = true;
-  wayland.windowManager.hyprland.settings = {
-    "$terminal" = "kitty";
-    "$mod" = "SUPER";
+  wayland.windowManager.hyprland = {
+    enable = true;
+    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    settings = {
+      "$terminal" = "kitty";
+      "$mod" = "SUPER";
 
-    monitor = [
-      ",prefered,auto,1"
-    ];
+      monitor = [
+        ",prefered,auto,1"
+      ];
 
-    xwayland = {
-      force_zero_scaling = true;
-    };
-
-    general = {
-      border_size = 0;
-      gaps_in = 0;
-      gaps_out = 0;
-      layout = "dwindle";
-      allow_tearing = true;
-    };
-
-    input = {
-      kb_layout = "us";
-      follow_mouse = true;
-      touchpad = {
-        natural_scroll = true;
+      xwayland = {
+        force_zero_scaling = true;
       };
-      accel_profile = "flat";
-      sensitivity = 0;
+
+      general = {
+        border_size = 0;
+        gaps_in = 0;
+        gaps_out = 0;
+        layout = "dwindle";
+        allow_tearing = true;
+      };
+
+      input = {
+        kb_layout = "us";
+        follow_mouse = true;
+        touchpad = {
+          natural_scroll = true;
+        };
+        accel_profile = "flat";
+        sensitivity = 0;
+      };
+
+      decoration = {
+        rounding = 5;
+        inactive_opacity = 0.9;
+        blur.enabled = false;
+        shadow.enabled = false;
+      };
+
+      misc = {
+        vfr = true;
+        disable_hyprland_logo = true;
+        disable_splash_rendering = true;
+      };
+
+      bind = [
+        # General
+        "$mod, return, exec, $terminal"
+        "$mod SHIFT, q, killactive"
+        "$mod SHIFT, e, exit"
+        "$mod SHIFT, l, exec, ${pkgs.hyprlock}/bin/hyprlock"
+
+        # Workspaces
+        "$mod, 1, workspace, 1"
+        "$mod, 2, workspace, 2"
+        "$mod, 3, workspace, 3"
+        "$mod, 4, workspace, 4"
+        "$mod, 5, workspace, 5"
+        "$mod, 6, workspace, 6"
+        "$mod, 7, workspace, 7"
+        "$mod, 8, workspace, 8"
+        "$mod, 9, workspace, 9"
+        "$mod, 0, workspace, 10"
+
+        "$mod, left, exec, hyprland-relative-workspace b"
+        "$mod, right, exec, hyprland-relative-workspace f"
+
+        # Move to workspaces
+        "$mod SHIFT, 1, movetoworkspace,1"
+        "$mod SHIFT, 2, movetoworkspace,2"
+        "$mod SHIFT, 3, movetoworkspace,3"
+        "$mod SHIFT, 4, movetoworkspace,4"
+        "$mod SHIFT, 5, movetoworkspace,5"
+        "$mod SHIFT, 6, movetoworkspace,6"
+        "$mod SHIFT, 7, movetoworkspace,7"
+        "$mod SHIFT, 8, movetoworkspace,8"
+        "$mod SHIFT, 9, movetoworkspace,9"
+        "$mod SHIFT, 0, movetoworkspace,10"
+
+        # Applications
+        "$mod ALT, b, exec, brave"
+        "$mod ALT, c, exec, code"
+        "$mod ALT, d, exec, discord"
+        "$mod ALT, f, exec, pcmanfm"
+        "$mod ALT, t, exec, telegram-desktop"
+        "$mod ALT, w, exec, swriter"
+
+        # Brightness
+        ",XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 2%-"
+        ",XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl s +2%"
+
+        # Screenshot
+        ", Print, exec, hyprshot -m region --clipboard-only"
+        "SHIFT, Print, exec, hyprshot -m window --clipboard-only"
+      ];
+
+      bindm = [
+        "$mod, mouse:272, movewindow"
+        "$mod, mouse:273, resizewindow"
+      ];
+
+      gestures = {
+        workspace_swipe = true;
+      };
+
+      workspace = [
+        "1, on-created-empty: brave"
+        "2, on-created-empty: code"
+        "3, on-created-empty: discord"
+        "4, on-created-empty: telegram-desktop"
+      ];
+
+      windowrulev2 = [
+        "float, class:^(pavucontrol)$"
+        "size 700 700, class:^(pavucontrol)$"
+        "float, class:^(nmtui)$"
+        "size 700 700, class:^(nmtui)$"
+      ];
+
+      exec-once = "waybar";
     };
-
-    decoration = {
-      rounding = 5;
-      inactive_opacity = 0.9;
-      blur.enabled = false;
-      drop_shadow = false;
-    };
-
-    misc = {
-      disable_hyprland_logo = true;
-      disable_splash_rendering = true;
-    };
-
-    bind = [
-      # General
-      "$mod, return, exec, $terminal"
-      "$mod SHIFT, q, killactive"
-      "$mod SHIFT, e, exit"
-      "$mod SHIFT, l, exec, ${pkgs.hyprlock}/bin/hyprlock"
-
-      # Workspaces
-      "$mod, 1, workspace, 1"
-      "$mod, 2, workspace, 2"
-      "$mod, 3, workspace, 3"
-      "$mod, 4, workspace, 4"
-      "$mod, 5, workspace, 5"
-      "$mod, 6, workspace, 6"
-      "$mod, 7, workspace, 7"
-      "$mod, 8, workspace, 8"
-      "$mod, 9, workspace, 9"
-      "$mod, 0, workspace, 10"
-
-      "$mod, left, exec, hyprland-relative-workspace b"
-      "$mod, right, exec, hyprland-relative-workspace f"
-
-      # Move to workspaces
-      "$mod SHIFT, 1, movetoworkspace,1"
-      "$mod SHIFT, 2, movetoworkspace,2"
-      "$mod SHIFT, 3, movetoworkspace,3"
-      "$mod SHIFT, 4, movetoworkspace,4"
-      "$mod SHIFT, 5, movetoworkspace,5"
-      "$mod SHIFT, 6, movetoworkspace,6"
-      "$mod SHIFT, 7, movetoworkspace,7"
-      "$mod SHIFT, 8, movetoworkspace,8"
-      "$mod SHIFT, 9, movetoworkspace,9"
-      "$mod SHIFT, 0, movetoworkspace,10"
-
-      # Applications
-      "$mod ALT, b, exec, brave"
-      "$mod ALT, c, exec, code"
-      "$mod ALT, d, exec, discord"
-      "$mod ALT, f, exec, pcmanfm"
-      "$mod ALT, t, exec, telegram-desktop"
-      "$mod ALT, w, exec, swriter"
-
-      # Brightness
-      ",XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 2%-"
-      ",XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl s +2%"
-
-      # Screenshot
-      ", Print, exec, hyprshot -m region --clipboard-only"
-      "SHIFT, Print, exec, hyprshot -m window --clipboard-only"
-    ];
-
-    bindm = [
-      "$mod, mouse:272, movewindow"
-      "$mod, mouse:273, resizewindow"
-    ];
-
-    gestures = {
-      workspace_swipe = true;
-    };
-
-    workspace = [
-      "1, on-created-empty: brave"
-      "2, on-created-empty: code"
-      "3, on-created-empty: discord"
-      "4, on-created-empty: telegram-desktop"
-    ];
-
-    windowrulev2 = [
-      "float, class:^(pavucontrol)$"
-      "size 700 700, class:^(pavucontrol)$"
-      "float, class:^(nmtui)$"
-      "size 700 700, class:^(nmtui)$"
-    ];
   };
 
   home.sessionVariables.NIXOS_OZONE_WL = "1";
 
-  programs.waybar.enable = true;
-  programs.waybar.settings = [
-    {
-      layer = "top";
-      position = "top";
-      spacing = 4;
-      modules-left = [
-        "image#os"
-        "hyprland/workspaces"
-      ];
-      modules-center = [
-        "hyprland/window"
-      ];
-      modules-right = [
-        "pulseaudio"
-        "network"
-        "cpu"
-        "memory"
-        "temperature"
-        "battery"
-        "clock"
-      ];
+  programs.waybar = {
+    enable = true;
+    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.waybar-hyprland;
+    settings = [
+      {
+        layer = "top";
+        position = "top";
+        spacing = 7;
+        modules-left = [
+          "image#os"
+          "custom/os-name"
+          "hyprland/workspaces"
+        ];
+        modules-center = [
+          "hyprland/window"
+        ];
+        modules-right = [
+          "pulseaudio"
+          "network"
+          "cpu"
+          "memory"
+          "temperature"
+          "battery"
+          "clock"
+        ];
 
-      "image#os" = {
-        path = "/etc/nixos/assets/plopmenz.svg";
-        size = 25;
-        tooltip = false;
-        on-click = "poweroff";
-        on-click-right = "reboot";
-      };
-
-      "hyprland/workspaces" = {
-        disable-scroll = true;
-        all-outputs = true;
-        warp-on-scroll = false;
-        format = "{name}";
-        format-icons = {
-          urgent = "";
-          active = "";
-          default = "";
+        "image#os" = {
+          path = "/etc/nixos/assets/plopmenz.png";
+          size = 20;
+          tooltip = false;
+          on-click = "poweroff";
+          on-click-right = "reboot";
         };
-      };
-      "pulseaudio" = {
-        format = "{icon}  {volume}%";
-        format-bluetooth = "{icon}  {volume}%    {format_source}";
-        format-bluetooth-muted = "  {icon}    {format_source}";
-        format-muted = "  {format_source}";
-        format-source = "  {volume}%";
-        format-source-muted = "";
-        format-icons = {
-          headphone = "";
-          hands-free = "";
-          headset = "";
-          phone = "";
-          portable = "";
-          car = "";
-          default = [ "" "" "" ];
+
+        "custom/os-name" = {
+          format = "PlopmenzOS";
         };
-        on-click = "pavucontrol";
-      };
-      "network" = {
-        format-wifi = "   {essid} ({signalStrength}%)";
-        format-ethernet = "{ipaddr}/{cidr} ";
-        tooltip-format = "{ifname} via {gwaddr} ";
-        format-linked = "{ifname} (No IP) ";
-        format-disconnected = "Disconnected ⚠";
-        on-click = "kitty --class nmtui nmtui";
-      };
-      "cpu" = {
-        format = "  {usage}%";
-        tooltip = true;
-      };
-      "memory" = {
-        format = "  {}%";
-        tooltip = true;
-      };
-      "temperature" = {
-        interval = 10;
-        hwmon-path = "/sys/devices/platform/coretemp.0/hwmon/hwmon3/temp1_input";
-        critical-threshold = 100;
-        format-critical = " {temperatureC}";
-        format = " {temperatureC}°C";
-      };
-      "battery" = {
-        states = {
-          warning = 30;
-          critical = 15;
+
+        "hyprland/workspaces" = {
+          disable-scroll = true;
+          all-outputs = true;
+          warp-on-scroll = false;
+          format = "{name}";
+          format-icons = {
+            urgent = "";
+            active = "";
+            default = "";
+          };
         };
-        format = "{icon}   {capacity}%";
-        format-full = "{icon}   {capacity}%";
-        format-charging = " {capacity}%";
-        format-plugged = " {capacity}%";
-        format-alt = "{time}   {icon}";
-        format-icons = [ "" "" "" "" "" ];
-      };
-      "clock" = {
-        format = "{:%H:%M | %e %B} ";
-        tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-        format-alt = "{:%Y-%m-%d}";
-      };
-    }
-  ];
-  programs.waybar.style = ''
-    * {
-      /* `otf-font-awesome` and SpaceMono Nerd Font are required to be installed for icons */
-      font-family: "Fira Sans Semibold", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
-      font-size: 15px;
-      transition: background-color .3s ease-out;
-    }
+        "pulseaudio" = {
+          format = "{icon} {volume}%";
+          format-bluetooth = "{icon} {volume}%  {format_source}";
+          format-bluetooth-muted = " {icon}  {format_source}";
+          format-muted = " {format_source}";
+          format-source = " {volume}%";
+          format-source-muted = "";
+          format-icons = {
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = [
+              ""
+              ""
+              ""
+            ];
+          };
+          on-click = "pavucontrol";
+        };
+        "network" = {
+          format-wifi = "  {essid} ({signalStrength}%)";
+          format-ethernet = "{ipaddr}/{cidr} ";
+          tooltip-format = "{ifname} via {gwaddr} ";
+          format-linked = "{ifname} (No IP) ";
+          format-disconnected = "Disconnected ⚠";
+          on-click = "kitty --class nmtui nmtui";
+        };
+        "cpu" = {
+          format = " {usage}%";
+          tooltip = true;
+        };
+        "memory" = {
+          format = " {}%";
+          tooltip = true;
+        };
+        "temperature" = {
+          interval = 10;
+          hwmon-path = "/sys/devices/platform/coretemp.0/hwmon/hwmon3/temp1_input";
+          critical-threshold = 100;
+          format-critical = " {temperatureC}";
+          format = " {temperatureC}°C";
+        };
+        "battery" = {
+          states = {
+            warning = 30;
+            critical = 15;
+          };
+          format = "{icon}   {capacity}%";
+          format-full = "{icon}   {capacity}%";
+          format-charging = "{capacity}%";
+          format-plugged = " {capacity}%";
+          format-icons = [
+            ""
+            ""
+            ""
+            ""
+            ""
+          ];
+        };
+        "clock" = {
+          format = "{:%H:%M | %e %B} ";
+          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+          format-alt = "{:%Y-%m-%d}";
+        };
+      }
+    ];
+    style = ''
+      * {
+        /* `otf-font-awesome` and SpaceMono Nerd Font are required to be installed for icons */
+        min-height: 0;
+        padding: 0;
+        margin: 0;
+        color: #c0caf5;
+      }
 
-    window#waybar {
-      background: rgba(26, 27, 38, 0.75);
-      color: #c0caf5;
-      font-family: 
-        SpaceMono Nerd Font,
-        feather;
-      transition: background-color .5s;
-    }
+      window#waybar {
+        background: rgba(26, 27, 38, 0.75);
+        font-family: 
+          SpaceMono Nerd Font,
+          feather;
+        font-size: 12px;
+      }
 
-    .modules-left,
-    .modules-center,
-    .modules-right
-    {
-      background: rgba(0, 0, 8, .7);
-      margin: 5px 10px;
-      padding: 0 5px;
-      border-radius: 15px;
-    }
-    .modules-left {
-      padding: 0;
-    }
-    .modules-center {
-      padding: 0 10px;
-    }
+      .modules-left,
+      .modules-center,
+      .modules-right
+      {
+        background: rgba(0, 0, 8, .7);
+        border-radius: 10px;
+        padding: 2px 5px;
+        margin: 2px 2px;
+      }
 
-    #clock,
-    #battery,
-    #cpu,
-    #memory,
-    #disk,
-    #temperature,
-    #backlight,
-    #network,
-    #pulseaudio,
-    #wireplumber,
-    #custom-media,
-    #tray,
-    #mode,
-    #scratchpad,
-    #power-profiles-daemon,
-    #mpd {
-      padding: 0 10px;
-      border-radius: 15px;
-    }
+      button {
+        background: transparent;
+      }
 
-    #clock:hover,
-    #battery:hover,
-    #cpu:hover,
-    #memory:hover,
-    #disk:hover,
-    #temperature:hover,
-    #backlight:hover,
-    #network:hover,
-    #pulseaudio:hover,
-    #wireplumber:hover,
-    #custom-media:hover,
-    #tray:hover,
-    #mode:hover,
-    #scratchpad:hover,
-    #power-profiles-daemon:hover,
-    #mpd:hover {
-      background: rgba(26, 27, 38, 0.9);
-    }
-
-
-    #workspaces button {
-      background: transparent;
-      font-family:
-        SpaceMono Nerd Font,
-        feather;
-      font-weight: 900;
-      font-size: 13pt;
-      color: #c0caf5;
-      border:none;
-      border-radius: 15px;
-    }
-
-    #workspaces button.active {
-      background: #13131d; 
-    }
-
-    #workspaces button:hover {
-      background: #11111b;
-      color: #cdd6f4;
-      box-shadow: none;
-    }
-
-    #image.os {
-      margin-left: 10px;
-      padding: 2px 0px;
-    }
-  '';
-  programs.waybar.systemd.enable = true;
+      button:hover {
+        background: rgba(50, 50, 100, 1);
+      }
+    '';
+  };
   # end window manager
 
   # start dark mode
-  gtk = {
-    enable = true;
-    theme = {
-      name = "Breeze-Dark";
-      package = pkgs.libsForQt5.breeze-gtk;
-    };
-    gtk3 = {
-      extraConfig.gtk-application-prefer-dark-theme = true;
-    };
+  home.pointerCursor = {
+    gtk.enable = true;
+    # x11.enable = true;
+    package = pkgs.bibata-cursors;
+    name = "Bibata-Modern-Classic";
+    size = 16;
   };
 
-  qt = {
+  gtk = {
     enable = true;
-    platformTheme = {
-      name = "gtk";
+
+    theme = {
+      package = pkgs.flat-remix-gtk;
+      name = "Flat-Remix-GTK-Grey-Darkest";
     };
-    style = {
-      name = "gtk2";
-      package = pkgs.libsForQt5.breeze-qt5;
+
+    iconTheme = {
+      package = pkgs.adwaita-icon-theme;
+      name = "Adwaita";
+    };
+
+    font = {
+      name = "Sans";
+      size = 11;
     };
   };
   # end dark mode
@@ -431,7 +401,7 @@
 
       golang.go
       rust-lang.rust-analyzer
-      #juanblanco.solidity
+      # juanblanco.solidity
       bradlc.vscode-tailwindcss
     ];
     userSettings = {
