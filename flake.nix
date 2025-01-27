@@ -13,8 +13,6 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # xnode-manager.url = "github:Openmesh-Network/xnode-manager";
   };
 
   outputs =
@@ -33,12 +31,6 @@
           modules = [
             ./nixos/configuration.nix
             inputs.sops-nix.nixosModules.sops
-            # {
-            #   imports = [
-            #     inputs.xnode-manager.nixosModules.default
-            #   ];
-            #   services.xnode-manager.enable = true;
-            # }
           ];
         };
       };

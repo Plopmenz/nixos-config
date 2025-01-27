@@ -115,8 +115,8 @@
         "$mod, 9, workspace, 9"
         "$mod, 0, workspace, 10"
 
-        "$mod, left, exec, hyprland-relative-workspace b"
-        "$mod, right, exec, hyprland-relative-workspace f"
+        "$mod, left, workspace, -1"
+        "$mod, right, workspace, +1"
 
         # Move to workspaces
         "$mod SHIFT, 1, movetoworkspace,1"
@@ -145,6 +145,7 @@
         # Screenshot
         ", Print, exec, hyprshot -m region --clipboard-only"
         "SHIFT, Print, exec, hyprshot -m window --clipboard-only"
+        "SHIFT ALT, Print, exec, hyprshot -m output --clipboard-only"
       ];
 
       bindm = [
@@ -164,8 +165,8 @@
       ];
 
       windowrulev2 = [
-        "float, class:^(pavucontrol)$"
-        "size 700 700, class:^(pavucontrol)$"
+        "float, class:^(org.pulseaudio.pavucontrol)$"
+        "size 700 700, class:^(org.pulseaudio.pavucontrol)$"
         "float, class:^(nmtui)$"
         "size 700 700, class:^(nmtui)$"
       ];
@@ -207,7 +208,7 @@
           size = 20;
           tooltip = false;
           on-click = "poweroff";
-          on-click-right = "reboot";
+          on-click-middle = "reboot";
         };
 
         "custom/os-name" = {
@@ -275,8 +276,8 @@
             warning = 30;
             critical = 15;
           };
-          format = "{icon}   {capacity}%";
-          format-full = "{icon}   {capacity}%";
+          format = "{icon}  {capacity}%";
+          format-full = "{icon}  {capacity}%";
           format-charging = "{capacity}%";
           format-plugged = " {capacity}%";
           format-icons = [

@@ -31,11 +31,11 @@
         experimental-features = "nix-command flakes";
         flake-registry = "";
         nix-path = config.nix.nixPath;
-        auto-optimise-store = true;
 
         # substituters = [ "https://hyprland.cachix.org" ];
         # trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
       };
+      optimise.automatic = true;
       channel.enable = false;
 
       registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
@@ -43,9 +43,8 @@
 
       gc = {
         automatic = true;
-        dates = "hourly";
-        randomizedDelaySec = "15min";
-        options = "--delete-old --delete-older-than 1d";
+        dates = "daily";
+        options = "--delete-older-than 1d";
       };
     };
 
