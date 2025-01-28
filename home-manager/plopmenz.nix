@@ -52,7 +52,6 @@
   programs.kitty.enable = true;
   wayland.windowManager.hyprland = {
     enable = true;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
     xwayland.enable = true;
     settings = {
       "$terminal" = "kitty";
@@ -134,10 +133,7 @@
         # Applications
         "$mod ALT, b, exec, brave"
         "$mod ALT, c, exec, code"
-        "$mod ALT, d, exec, discord"
-        "$mod ALT, f, exec, pcmanfm"
-        "$mod ALT, t, exec, telegram-desktop"
-        "$mod ALT, w, exec, swriter"
+        "$mod, z, exec, rofi -show drun"
 
         # Brightness
         ",XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 2%-"
@@ -161,8 +157,6 @@
       workspace = [
         "1, on-created-empty: brave"
         "2, on-created-empty: code"
-        "3, on-created-empty: discord"
-        "4, on-created-empty: telegram-desktop"
       ];
 
       windowrulev2 = [
@@ -172,7 +166,10 @@
         "size 700 700, class:^(nmtui)$"
       ];
 
-      exec-once = "waybar";
+      exec-once = [
+        "waybar"
+        "dunst"
+      ];
     };
   };
 
@@ -363,6 +360,14 @@
       ];
     };
   };
+
+  programs.rofi = {
+    enable = true;
+  };
+
+  services.dunst = {
+    enable = true;
+  };
   # end window manager
 
   # start dark mode
@@ -441,6 +446,13 @@
     userSettings = {
       "editor.formatOnSave" = true;
     };
+  };
+
+  programs.obs-studio = {
+    enable = true;
+    plugins = with pkgs.obs-studio-plugins; [
+      wlrobs
+    ];
   };
 
   systemd.user.startServices = "sd-switch";

@@ -34,9 +34,6 @@
         ];
         flake-registry = "";
         nix-path = config.nix.nixPath;
-
-        substituters = [ "https://hyprland.cachix.org" ];
-        trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
       };
       optimise.automatic = true;
       channel.enable = false;
@@ -98,9 +95,7 @@
   services.greetd =
     let
       tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
-      hyprland-session = "${
-        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland
-      }/share/wayland-sessions";
+      hyprland-session = "${pkgs.hyprland}/share/wayland-sessions";
     in
     {
       enable = true;
@@ -121,16 +116,13 @@
     TTYVTDisallocate = true;
   };
 
-  hardware.graphics =
-    let
-      hyprland-pkgs = inputs.hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-    in
-    {
-      package = hyprland-pkgs.mesa.drivers;
-
-      enable32Bit = true;
-      package32 = hyprland-pkgs.pkgsi686Linux.mesa.drivers;
-    };
+  # GPU
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      vpl-gpu-rt
+    ];
+  };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
