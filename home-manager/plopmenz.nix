@@ -52,7 +52,8 @@
   programs.kitty.enable = true;
   wayland.windowManager.hyprland = {
     enable = true;
-    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    xwayland.enable = true;
     settings = {
       "$terminal" = "kitty";
       "$mod" = "SUPER";
@@ -179,7 +180,6 @@
 
   programs.waybar = {
     enable = true;
-    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.waybar-hyprland;
     settings = [
       {
         layer = "top";
@@ -207,7 +207,7 @@
           path = "/etc/nixos/assets/plopmenz.png";
           size = 20;
           tooltip = false;
-          on-click = "poweroff";
+          on-click = "shutdown now"; # hyprctl --batch `hyprctl -j clients | jq -r '.[] | \"dispatch closewindow address:\(.address);\"'`
           on-click-middle = "reboot";
         };
 
@@ -331,6 +331,38 @@
       }
     '';
   };
+
+  programs.hyprlock = {
+    enable = true;
+    settings = {
+      general = {
+        grace = 1;
+      };
+
+      background = [
+        {
+          blur_passes = 3;
+          blur_size = 3;
+        }
+      ];
+
+      label = {
+        text = "cmd[update:1000] echo \"$(date +\"%-I:%M\")\"";
+        font_size = 95;
+        font_family = "JetBrains Mono Bold";
+        position = "0, 150";
+        halign = "center";
+        valign = "center";
+      };
+
+      input-field = [
+        {
+          size = "200, 75";
+          position = "0, -80";
+        }
+      ];
+    };
+  };
   # end window manager
 
   # start dark mode
@@ -399,6 +431,7 @@
       ms-vscode.makefile-tools
       jnoortheen.nix-ide
       redhat.vscode-xml
+      github.vscode-github-actions
 
       golang.go
       rust-lang.rust-analyzer

@@ -28,12 +28,15 @@
     in
     {
       settings = {
-        experimental-features = "nix-command flakes";
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
         flake-registry = "";
         nix-path = config.nix.nixPath;
 
-        # substituters = [ "https://hyprland.cachix.org" ];
-        # trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+        substituters = [ "https://hyprland.cachix.org" ];
+        trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
       };
       optimise.automatic = true;
       channel.enable = false;
@@ -88,10 +91,46 @@
   services.xserver.enable = true;
 
   # Hyprland
-  programs.hyprland = {
-    enable = true;
-    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+  programs.dconf.enable = true;
+
+  security.pam.services.hyprlock = { };
+
+  services.greetd =
+    let
+      tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
+      hyprland-session = "${
+        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland
+      }/share/wayland-sessions";
+    in
+    {
+      enable = true;
+      settings = {
+        default_session = {
+          command = "${tuigreet} --remember  --remember-session --asterisks --time  --greeting \"Welcome to PlopmenzOS!\" --sessions ${hyprland-session}";
+        };
+      };
+    };
+
+  systemd.services.greetd.serviceConfig = {
+    Type = "idle";
+    StandardInput = "tty";
+    StandardOutput = "tty";
+    StandardError = "journal";
+    TTYReset = true;
+    TTYVHangup = true;
+    TTYVTDisallocate = true;
   };
+
+  hardware.graphics =
+    let
+      hyprland-pkgs = inputs.hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+    in
+    {
+      package = hyprland-pkgs.mesa.drivers;
+
+      enable32Bit = true;
+      package32 = hyprland-pkgs.pkgsi686Linux.mesa.drivers;
+    };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
