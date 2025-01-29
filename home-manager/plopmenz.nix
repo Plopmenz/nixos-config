@@ -363,10 +363,57 @@
 
   programs.rofi = {
     enable = true;
+    package = pkgs.rofi-wayland;
+    font = "SpaceMono Nerd Font 12";
+    extraConfig = {
+      modi = "drun";
+      show-icons = true;
+      drun-display-format = "{icon} {name}";
+      display-drun = "Launch App";
+    };
+    theme =
+      let
+        inherit (config.lib.formats.rasi) mkLiteral;
+      in
+      {
+        "*" = {
+          background-color = mkLiteral "#24273A";
+          text-color = mkLiteral "#c0caf5";
+          border-color = mkLiteral "#c0caf5";
+        };
+        window.width = mkLiteral "30%";
+        mainbox = {
+          border = 1;
+          padding = 2;
+        };
+        listview = {
+          lines = 10;
+          spacing = 5;
+          padding = mkLiteral "5 0 0";
+        };
+        element.padding = 2;
+        "element.selected".background-color = mkLiteral "#363A4F";
+        element-text.background-color = mkLiteral "inherit";
+        inputbar = {
+          spacing = 5;
+          padding = 2;
+          border = mkLiteral "0 0 1";
+          border-color = mkLiteral "#c0caf5";
+        };
+      };
   };
 
   services.dunst = {
     enable = true;
+    settings = {
+      global = {
+        font = "Monospace 8";
+        background = "#000000";
+        foreground = "#c0caf5";
+        frame_color = "#c0caf5";
+        frame_width = 2;
+      };
+    };
   };
   # end window manager
 
