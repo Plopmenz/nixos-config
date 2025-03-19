@@ -5,7 +5,9 @@
   pkgs,
   ...
 }:
-
+let
+  pkgs-latest = import inputs.nixpkgs-latest { system = pkgs.system; };
+in
 {
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.allowUnfreePredicate = _: true;
@@ -21,11 +23,17 @@
       pkgs.nodejs_22
       pkgs.bun
       pkgs.gcc
-      pkgs.cargo
-      pkgs.rustc
+      pkgs-latest.cargo
+      pkgs-latest.rustc
+      pkgs.jdk21
+      pkgs.gnumake
+      pkgs.solc
+      pkgs-latest.foundry
+
       pkgs.rustfmt
       pkgs.clippy
       pkgs.nixfmt-rfc-style
+      pkgs.openssl
 
       pkgs.font-awesome
       (pkgs.nerdfonts.override { fonts = [ "SpaceMono" ]; })
@@ -34,6 +42,7 @@
       pkgs.hyprshot
       pkgs.pavucontrol
       pkgs.networkmanager
+      pkgs.unzip
 
       pkgs.libreoffice
       pkgs.gimp
@@ -45,6 +54,10 @@
     ];
     sessionVariables = {
       RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+      OPENSSL_NO_VENDOR = "1";
+      OPENSSL_DIR = "${pkgs.openssl.dev}";
+      OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
+      CARGO_NET_GIT_FETCH_WITH_CLI = "true";
     };
   };
 
@@ -407,7 +420,7 @@
     enable = true;
     settings = {
       global = {
-        font = "Monospace 8";
+        font = "SpaceMono Nerd Font 12";
         background = "#000000";
         foreground = "#c0caf5";
         frame_color = "#c0caf5";
@@ -492,6 +505,16 @@
     ];
     userSettings = {
       "editor.formatOnSave" = true;
+      "rust-analyzer.check.command" = "clippy";
+      "[json]" = {
+        "editor.defaultFormatter" = "esbenp.prettier-vscode";
+      };
+      "[typescript]" = {
+        "editor.defaultFormatter" = "esbenp.prettier-vscode";
+      };
+      "[typescriptreact]" = {
+        "editor.defaultFormatter" = "esbenp.prettier-vscode";
+      };
     };
   };
 
