@@ -23,8 +23,8 @@ in
       pkgs.nodejs_22
       pkgs.bun
       pkgs.gcc
-      pkgs-latest.cargo
-      pkgs-latest.rustc
+      pkgs.cargo
+      pkgs.rustc
       pkgs.jdk21
       pkgs.gnumake
       pkgs.solc
@@ -46,11 +46,13 @@ in
 
       pkgs.libreoffice
       pkgs.gimp
+      pkgs.texlive.combined.scheme-full
 
       pkgs.discord
       pkgs.telegram-desktop
 
       pkgs.postman
+      pkgs.bruno
     ];
     sessionVariables = {
       RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
@@ -114,7 +116,7 @@ in
         "$mod, return, exec, $terminal"
         "$mod SHIFT, q, killactive"
         "$mod SHIFT, e, exit"
-        "$mod SHIFT, l, exec, ${pkgs.hyprlock}/bin/hyprlock"
+        "$mod SHIFT, l, exec, ${lib.getExe pkgs.hyprlock}"
 
         # Workspaces
         "$mod, 1, workspace, 1"
@@ -149,13 +151,17 @@ in
         "$mod, z, exec, rofi -show drun"
 
         # Brightness
-        ",XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 2%-"
-        ",XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl s +2%"
+        ",XF86MonBrightnessDown, exec, ${lib.getExe pkgs.brightnessctl} s 2%-"
+        ",XF86MonBrightnessUp, exec, ${lib.getExe pkgs.brightnessctl} s +2%"
 
         # Screenshot
+        "$mod, s, exec, hyprshot -m region --clipboard-only"
         ", Print, exec, hyprshot -m region --clipboard-only"
         "SHIFT, Print, exec, hyprshot -m window --clipboard-only"
         "SHIFT ALT, Print, exec, hyprshot -m output --clipboard-only"
+
+        # Utilities
+        "$mod, v, exec, ${lib.getExe pkgs.xclip} -selection clipboard -out | tr \\\\n \\\\r | ${lib.getExe pkgs.xdotool} type --clearmodifiers --delay 25 --file -"
       ];
 
       bindm = [
@@ -485,7 +491,7 @@ in
 
   programs.vscode = {
     enable = true;
-    extensions = with pkgs.vscode-extensions; [
+    extensions = with inputs.community-vscode-extensions.extensions.${pkgs.system}.vscode-marketplace; [
       streetsidesoftware.code-spell-checker
       visualstudioexptteam.vscodeintellicode
       visualstudioexptteam.intellicode-api-usage-examples
@@ -500,8 +506,10 @@ in
 
       golang.go
       rust-lang.rust-analyzer
-      # juanblanco.solidity
+      juanblanco.solidity
       bradlc.vscode-tailwindcss
+
+      james-yu.latex-workshop
     ];
     userSettings = {
       "editor.formatOnSave" = true;
