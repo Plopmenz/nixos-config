@@ -20,7 +20,7 @@ in
       secretedit = "nix-shell -p sops --run 'cd /etc/nixos && sops secrets/plopmenz.yaml'";
     };
     packages = [
-      pkgs.nodejs_22
+      pkgs.nodejs
       pkgs.bun
       pkgs.gcc
       pkgs.cargo
@@ -29,6 +29,7 @@ in
       pkgs.gnumake
       pkgs.solc
       pkgs-latest.foundry
+      pkgs.python3
 
       pkgs.rustfmt
       pkgs.clippy
@@ -43,9 +44,13 @@ in
       pkgs.pavucontrol
       pkgs.networkmanager
       pkgs.unzip
+      pkgs.ffmpeg
 
       pkgs.libreoffice
       pkgs.gimp
+      pkgs.davinci-resolve
+      pkgs.shotcut
+      pkgs.xplayer
       pkgs.texlive.combined.scheme-full
 
       pkgs.discord
@@ -60,6 +65,19 @@ in
       OPENSSL_DIR = "${pkgs.openssl.dev}";
       OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
       CARGO_NET_GIT_FETCH_WITH_CLI = "true";
+    };
+  };
+
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "text/html" = "brave.desktop";
+      "x-scheme-handler/http" = "brave.desktop";
+      "x-scheme-handler/https" = "brave.desktop";
+      "application/pdf" = "brave.desktop";
+
+      "audio/mpeg" = "xplayer.desktop";
+      "video/mp4" = "xplayer.desktop";
     };
   };
 
@@ -506,6 +524,7 @@ in
 
       golang.go
       rust-lang.rust-analyzer
+      ms-python.python
       juanblanco.solidity
       bradlc.vscode-tailwindcss
 

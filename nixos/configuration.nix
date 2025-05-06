@@ -69,6 +69,11 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # Enable bluetooth
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+  services.blueman.enable = true;
+
   # Set your time zone.
   time.timeZone = "Europe/Rome";
 
@@ -124,6 +129,7 @@
     enable = true;
     extraPackages = with pkgs; [
       vpl-gpu-rt
+      rocmPackages.clr.icd
     ];
   };
 
@@ -180,6 +186,8 @@
 
   virtualisation.virtualbox.host.enable = true;
   users.extraGroups.vboxusers.members = [ "plopmenz" ];
+
+  programs.droidcam.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
