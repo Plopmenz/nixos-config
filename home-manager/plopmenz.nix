@@ -12,6 +12,8 @@ in
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.allowUnfreePredicate = _: true;
 
+  fonts.fontconfig.enable = true;
+
   home = {
     username = "plopmenz";
     homeDirectory = "/home/plopmenz";
@@ -36,8 +38,7 @@ in
       pkgs.nixfmt-rfc-style
       pkgs.openssl
 
-      pkgs.font-awesome
-      (pkgs.nerdfonts.override { fonts = [ "SpaceMono" ]; })
+      pkgs-latest.nerd-fonts.space-mono
 
       pkgs.pcmanfm
       pkgs.hyprshot
@@ -48,9 +49,8 @@ in
 
       pkgs.libreoffice
       pkgs.gimp
-      pkgs.davinci-resolve
       pkgs.shotcut
-      pkgs.xplayer
+      pkgs.vlc
       pkgs.texlive.combined.scheme-full
 
       pkgs.discord
@@ -76,8 +76,8 @@ in
       "x-scheme-handler/https" = "brave.desktop";
       "application/pdf" = "brave.desktop";
 
-      "audio/mpeg" = "xplayer.desktop";
-      "video/mp4" = "xplayer.desktop";
+      "audio/mpeg" = "vlc.desktop";
+      "video/mp4" = "vlc.desktop";
     };
   };
 
@@ -199,8 +199,8 @@ in
       windowrulev2 = [
         "float, class:^(org.pulseaudio.pavucontrol)$"
         "size 700 700, class:^(org.pulseaudio.pavucontrol)$"
-        "float, class:^(nmtui)$"
-        "size 700 700, class:^(nmtui)$"
+        "float, class:^(org.twosheds.iwgtk)$"
+        "size 700 700, class:^(org.twosheds.iwgtk)$"
       ];
 
       exec-once = [
@@ -288,7 +288,7 @@ in
           tooltip-format = "{ifname} via {gwaddr} ";
           format-linked = "{ifname} (No IP) ";
           format-disconnected = "Disconnected ⚠";
-          on-click = "kitty --class nmtui nmtui";
+          on-click = "${lib.getExe pkgs.iwgtk}";
         };
         "cpu" = {
           format = " {usage}%";
@@ -341,7 +341,7 @@ in
       window#waybar {
         background: rgba(26, 27, 38, 0.75);
         font-family: 
-          SpaceMono Nerd Font,
+          SpaceMono,
           feather;
         font-size: 12px;
       }
@@ -401,7 +401,7 @@ in
   programs.rofi = {
     enable = true;
     package = pkgs.rofi-wayland;
-    font = "SpaceMono Nerd Font 12";
+    font = "SpaceMono 12";
     extraConfig = {
       modi = "drun";
       show-icons = true;
@@ -444,7 +444,7 @@ in
     enable = true;
     settings = {
       global = {
-        font = "SpaceMono Nerd Font 12";
+        font = "SpaceMono 12";
         background = "#000000";
         foreground = "#c0caf5";
         frame_color = "#c0caf5";
@@ -533,6 +533,7 @@ in
     userSettings = {
       "editor.formatOnSave" = true;
       "rust-analyzer.check.command" = "clippy";
+      "latex-workshop.formatting.latex" = "latexindent";
       "[json]" = {
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
       };

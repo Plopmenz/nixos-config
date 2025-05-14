@@ -67,7 +67,55 @@
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
-  networking.networkmanager.enable = true;
+  # networking.networkmanager.enable = true;
+  networking = {
+    useDHCP = false;
+    useNetworkd = true;
+    wireless.iwd = {
+      enable = true;
+      settings.General.UseDefaultInterface = true;
+    };
+    firewall = {
+      extraCommands = ''
+        iptables -A INPUT -i vz-+ -p udp -m udp --dport 67 -j ACCEPT
+      '';
+      extraStopCommands = ''
+        iptables -D INPUT -i vz-+ -p udp -m udp --dport 67 -j ACCEPT || true
+      '';
+    };
+  };
+  services.resolved.enable = true;
+  systemd.network = {
+    enable = true;
+    wait-online = {
+      timeout = 10;
+      anyInterface = true;
+    };
+    networks =
+      let
+        baseNetworkConfig = {
+          DHCP = "yes";
+          DNSSEC = "yes";
+          DNSOverTLS = "yes";
+          DNS = [
+            "1.1.1.1"
+            "8.8.8.8"
+          ];
+        };
+      in
+      {
+        "wired" = {
+          matchConfig.Name = "en*";
+          networkConfig = baseNetworkConfig;
+          dhcpV4Config.RouteMetric = 100;
+        };
+        "wireless" = {
+          matchConfig.Name = "wl*";
+          networkConfig = baseNetworkConfig;
+          dhcpV4Config.RouteMetric = 200;
+        };
+      };
+  };
 
   # Enable bluetooth
   hardware.bluetooth.enable = true;
@@ -160,7 +208,6 @@
     initialPassword = "plopmenz";
     isNormalUser = true;
     extraGroups = [
-      "networkmanager"
       "wheel"
     ];
     packages = with pkgs; [
@@ -218,7 +265,7 @@
 
   environment.shellAliases = {
     sysrebuild = "sudo nixos-rebuild switch --flake /etc/nixos/#plopmenzPC";
-    sysupdate = "sudo nixos-rebuild switch --flake /etc/nixos/#plopmenzPC --update-input";
+    sysupdate = "sudo nix flake update --flake /etc/nixos";
     sysedit = "sudo nano /etc/nixos/nixos/configuration.nix";
     sysflake = "sudo nano /etc/nixos/flake.nix";
   };
