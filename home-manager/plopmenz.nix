@@ -6,7 +6,7 @@
   ...
 }:
 let
-  pkgs-latest = import inputs.nixpkgs-latest { system = pkgs.system; };
+  pkgs-stable = import inputs.nixpkgs-stable { system = pkgs.system; };
 in
 {
   nixpkgs.config.allowUnfree = true;
@@ -30,7 +30,7 @@ in
       pkgs.jdk21
       pkgs.gnumake
       pkgs.solc
-      pkgs-latest.foundry
+      pkgs.foundry
       pkgs.python3
 
       pkgs.rustfmt
@@ -38,7 +38,7 @@ in
       pkgs.nixfmt-rfc-style
       pkgs.openssl
 
-      pkgs-latest.nerd-fonts.space-mono
+      pkgs.nerd-fonts.space-mono
 
       pkgs.pcmanfm
       pkgs.hyprshot
@@ -509,39 +509,41 @@ in
 
   programs.vscode = {
     enable = true;
-    extensions = with inputs.community-vscode-extensions.extensions.${pkgs.system}.vscode-marketplace; [
-      streetsidesoftware.code-spell-checker
-      visualstudioexptteam.vscodeintellicode
-      visualstudioexptteam.intellicode-api-usage-examples
-      esbenp.prettier-vscode
+    profiles.default = {
+      extensions = with inputs.community-vscode-extensions.extensions.${pkgs.system}.vscode-marketplace; [
+        streetsidesoftware.code-spell-checker
+        visualstudioexptteam.vscodeintellicode
+        visualstudioexptteam.intellicode-api-usage-examples
+        esbenp.prettier-vscode
 
-      ms-azuretools.vscode-docker
-      tamasfe.even-better-toml
-      ms-vscode.makefile-tools
-      jnoortheen.nix-ide
-      redhat.vscode-xml
-      github.vscode-github-actions
+        ms-azuretools.vscode-docker
+        tamasfe.even-better-toml
+        ms-vscode.makefile-tools
+        jnoortheen.nix-ide
+        redhat.vscode-xml
+        github.vscode-github-actions
 
-      golang.go
-      rust-lang.rust-analyzer
-      ms-python.python
-      juanblanco.solidity
-      bradlc.vscode-tailwindcss
+        golang.go
+        rust-lang.rust-analyzer
+        ms-python.python
+        juanblanco.solidity
+        bradlc.vscode-tailwindcss
 
-      james-yu.latex-workshop
-    ];
-    userSettings = {
-      "editor.formatOnSave" = true;
-      "rust-analyzer.check.command" = "clippy";
-      "latex-workshop.formatting.latex" = "latexindent";
-      "[json]" = {
-        "editor.defaultFormatter" = "esbenp.prettier-vscode";
-      };
-      "[typescript]" = {
-        "editor.defaultFormatter" = "esbenp.prettier-vscode";
-      };
-      "[typescriptreact]" = {
-        "editor.defaultFormatter" = "esbenp.prettier-vscode";
+        james-yu.latex-workshop
+      ];
+      userSettings = {
+        "editor.formatOnSave" = true;
+        "rust-analyzer.check.command" = "clippy";
+        "latex-workshop.formatting.latex" = "latexindent";
+        "[json]" = {
+          "editor.defaultFormatter" = "esbenp.prettier-vscode";
+        };
+        "[typescript]" = {
+          "editor.defaultFormatter" = "esbenp.prettier-vscode";
+        };
+        "[typescriptreact]" = {
+          "editor.defaultFormatter" = "esbenp.prettier-vscode";
+        };
       };
     };
   };

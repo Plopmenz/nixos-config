@@ -38,7 +38,7 @@
         substituters = [ "https://nix-community.cachix.org" ];
         trusted-public-keys = [ "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
       };
-      # optimise.automatic = true;
+      optimise.automatic = true;
       channel.enable = false;
 
       registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
@@ -73,7 +73,7 @@
     useNetworkd = true;
     wireless.iwd = {
       enable = true;
-      settings.General.UseDefaultInterface = true;
+      settings.DriverQuirks.UseDefaultInterface = true;
     };
     firewall = {
       extraCommands = ''
@@ -185,7 +185,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
