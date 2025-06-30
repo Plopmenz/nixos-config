@@ -46,7 +46,6 @@
 
       gc = {
         automatic = true;
-        dates = "daily";
         options = "--delete-older-than 1d";
       };
     };
@@ -73,47 +72,84 @@
     useNetworkd = true;
     wireless.iwd = {
       enable = true;
-      settings.DriverQuirks.UseDefaultInterface = true;
-    };
-    firewall = {
-      extraCommands = ''
-        iptables -A INPUT -i vz-+ -p udp -m udp --dport 67 -j ACCEPT
-      '';
-      extraStopCommands = ''
-        iptables -D INPUT -i vz-+ -p udp -m udp --dport 67 -j ACCEPT || true
-      '';
+      settings = {
+        DriverQuirks = {
+          DefaultInterface = "*";
+        };
+        Scan = {
+          DisablePeriodicScan = true;
+        };
+      };
     };
   };
-  services.resolved.enable = true;
+
   systemd.network = {
     enable = true;
     wait-online = {
       timeout = 10;
       anyInterface = true;
     };
-    networks =
-      let
-        baseNetworkConfig = {
+    networks = {
+      "wired" = {
+        matchConfig.Name = "en*";
+        networkConfig = {
           DHCP = "yes";
-          DNSSEC = "yes";
-          DNSOverTLS = "yes";
-          DNS = [
-            "1.1.1.1"
-            "8.8.8.8"
-          ];
         };
-      in
+        dhcpV4Config.RouteMetric = 100;
+        dhcpV6Config.WithoutRA = "solicit";
+      };
+      "wireless" = {
+        matchConfig.Name = "wl*";
+        networkConfig = {
+          DHCP = "yes";
+        };
+        dhcpV4Config.RouteMetric = 200;
+        dhcpV6Config.WithoutRA = "solicit";
+      };
+      "80-container-vz" = {
+        matchConfig = {
+          Kind = "bridge";
+          Name = "vz-*";
+        };
+        networkConfig = {
+          Address = "192.168.0.0/16";
+          LinkLocalAddressing = "yes";
+          DHCPServer = "no";
+          IPMasquerade = "both";
+          LLDP = "yes";
+          EmitLLDP = "customer-bridge";
+          IPv6AcceptRA = "no";
+          IPv6SendRA = "yes";
+        };
+      };
+    };
+  };
+
+  services.resolved.enable = false;
+  services.dnsmasq = {
+    enable = true;
+    settings =
       {
-        "wired" = {
-          matchConfig.Name = "en*";
-          networkConfig = baseNetworkConfig;
-          dhcpV4Config.RouteMetric = 100;
-        };
-        "wireless" = {
-          matchConfig.Name = "wl*";
-          networkConfig = baseNetworkConfig;
-          dhcpV4Config.RouteMetric = 200;
-        };
+        server = [
+          "1.1.1.1"
+          "8.8.8.8"
+        ];
+        domain-needed = true;
+        bogus-priv = true;
+        no-resolv = true;
+        cache-size = 1000;
+        dhcp-range = [
+          "192.168.0.0,192.168.255.255,255.255.0.0,24h"
+        ];
+        expand-hosts = true;
+        local = "/container/";
+        domain = "container";
+      }
+      // {
+        dhcp-host = "192.168.91.1";
+        address = [
+          "/xnode.local/192.168.91.1"
+        ];
       };
   };
 
@@ -229,12 +265,15 @@
     pkgs.age
     pkgs.kitty
     pkgs.brightnessctl
+    pkgs.intel-gpu-tools
   ];
 
   virtualisation.virtualbox.host.enable = true;
   users.extraGroups.vboxusers.members = [ "plopmenz" ];
 
   programs.droidcam.enable = true;
+
+  programs.steam.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -269,4 +308,46 @@
     sysedit = "sudo nano /etc/nixos/nixos/configuration.nix";
     sysflake = "sudo nano /etc/nixos/flake.nix";
   };
+
+  hardware.enableAllFirmware = true;
+  hardware.enableRedistributableFirmware = true;
+
+  # systemd.services.create-hotspot = {
+  #   wantedBy = [ "iwd.service" ];
+  #   description = "Create hotspot (AP) virtual interface";
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #   };
+  #   path = [
+  #     pkgs.iw
+  #     pkgs.iproute2
+  #   ];
+  #   preStart = ''
+  #     iw ap0 del || true
+  #   '';
+  #   script = ''
+  #     iw phy0 interface add ap0 type __ap
+  #     ip addr add 192.168.91.1/24 dev ap0
+  #   '';
+  # };
+
+  # services.avahi = {
+  #   enable = true;
+  #   publish = {
+  #     enable = true;
+  #     addresses = true;
+  #   };
+  # };
+
+  # networking.firewall.allowedUDPPorts = [
+  #   53
+  #   67
+  # ];
+
+  # sudo iwctl station wlan0 disconnect
+  # sudo iwctl ap ap0 start "PlopmenzAP" "12345678"
+  # sudo iwctl station wlan0 get-networks
+  # sudo iwctl station wlan0 scan
+  # sudo iwctl ap ap0 stop
+  # sudo iwctl station wlan0 connect FatHamster --passphrase cicuta04
 }

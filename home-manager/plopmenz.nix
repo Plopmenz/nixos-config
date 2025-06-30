@@ -5,9 +5,6 @@
   pkgs,
   ...
 }:
-let
-  pkgs-stable = import inputs.nixpkgs-stable { system = pkgs.system; };
-in
 {
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.allowUnfreePredicate = _: true;
@@ -33,9 +30,9 @@ in
       pkgs.foundry
       pkgs.python3
 
-      pkgs.rustfmt
-      pkgs.clippy
       pkgs.nixfmt-rfc-style
+      pkgs.nil
+      pkgs.clippy
       pkgs.openssl
 
       pkgs.nerd-fonts.space-mono
@@ -58,6 +55,8 @@ in
 
       pkgs.postman
       pkgs.bruno
+
+      pkgs.prismlauncher
     ];
     sessionVariables = {
       RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
@@ -535,6 +534,9 @@ in
         "editor.formatOnSave" = true;
         "rust-analyzer.check.command" = "clippy";
         "latex-workshop.formatting.latex" = "latexindent";
+        "nix.enableLanguageServer" = true;
+        "nix.serverPath" = "${lib.getExe pkgs.nil}";
+        "nix.serverSettings.nil.formatting.command" = [ "${lib.getExe pkgs.nixfmt-rfc-style}" ];
         "[json]" = {
           "editor.defaultFormatter" = "esbenp.prettier-vscode";
         };
@@ -543,6 +545,9 @@ in
         };
         "[typescriptreact]" = {
           "editor.defaultFormatter" = "esbenp.prettier-vscode";
+        };
+        "[rust]" = {
+          "editor.defaultFormatter" = "rust-lang.rust-analyzer";
         };
       };
     };
